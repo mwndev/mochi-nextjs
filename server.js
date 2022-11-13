@@ -21,8 +21,8 @@ const run = async () => {
     console.log(`listening on port ${port}`);
   });
   process.stdin.on("data", (data) => {
-    console.log(data.toString());
-    //do some sort of server report here
+    console.log("this server doesn't accept shell commands");
+    //maybe do something cool here
   });
 
   sv.get("/", async (req, res) => {

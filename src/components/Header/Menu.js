@@ -1,10 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-
-const BoxItem = styled.div`
-  svg {
-  }
-`;
+import Link from "next/link";
 
 export default function Menu({ active, toggle }) {
   return (
@@ -37,8 +33,9 @@ export default function Menu({ active, toggle }) {
           justify-content: left;
           align-items: center;
         }
-        .boxItem > a {
+        span {
           padding-left: calc(0.1cm + 2vw);
+          color: var(--tc);
         }
         .exitWrapper {
           height: calc(1.3cm + 4vh);
@@ -76,16 +73,21 @@ export default function Menu({ active, toggle }) {
           </div>
         </div>
         <div className="boxItem">
-          <a>About us</a>
+          <span>About us</span>
         </div>
         <div className="boxItem">
-          <a>Visit us</a>
+          <span>Visit us</span>
         </div>
         <div className="boxItem">
-          <a>Order</a>
+          <span>Order</span>
         </div>
         <div className="boxItem">
-          <a>Contact</a>
+          <span>Contact</span>
+        </div>
+        <div className="boxItem">
+          <Link href={"/login"}>
+            <span>Login</span>
+          </Link>
         </div>
       </nav>
     </>
