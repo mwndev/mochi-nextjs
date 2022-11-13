@@ -73,16 +73,29 @@ export default function Menu({ active, toggle }) {
           </div>
         </div>
         <div className="boxItem">
-          <span>About us</span>
+          <Link href={"/about"}>
+            <span>About us</span>
+          </Link>
         </div>
         <div className="boxItem">
-          <span>Visit us</span>
+          <Link href={"/location"}>
+            <span>Visit us</span>
+          </Link>
         </div>
         <div className="boxItem">
-          <span>Order</span>
+          <Link href={"/order"}>
+            <span>Order</span>
+          </Link>
         </div>
         <div className="boxItem">
-          <span>Contact</span>
+          <Link href={"/order"}>
+            <span>Order now</span>
+          </Link>
+        </div>
+        <div className="boxItem">
+          <Link href={"/contact"}>
+            <span>Contact</span>
+          </Link>
         </div>
         <div className="boxItem">
           <Link href={"/login"}>

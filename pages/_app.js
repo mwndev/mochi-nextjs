@@ -3,36 +3,20 @@ import Header from "../src/components/Header/Header";
 import { UserContext } from "../src/contexts";
 
 //no "/" at end of url
-export const backendURL = `http://localhost:${process.env.PORT}`;
+export const backendURL = `http://localhost:${process.env.NEXT_PUBLIC_PORT}`;
 
 function MyApp({ Component, pageProps }) {
   const [user, setUser] = useState({});
 
-  const handleCallbackResponse = (res) => {
-    try {
-      console.log(`Encoded JWT Token: ${res.credentials}`);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
-    /*global google*/
-    google.accounts.id.initialize({
-      client_id:
-        "706801501845-gg3t3t0arpmkgs0o0bq8ctdnr0pc8q8d.apps.googleusercontent.com",
-      callback: handleCallbackResponse(),
-    });
-
-    google.accounts.id.renderButton(
-      document.getElementById("googleSignInDiv"),
-      {
-        theme: "outline",
-        size: "large",
+    const autoLogin = async () => {
+      const res = await fetch(`${backendURL}/autologin`);
+      const data = await res.json();
+      if (res.status !== 200) window.alert("problem reaching server.");
+      if (!data.valid) {
       }
-    );
-
-    const autoLogin = async () => {};
+      autoLogin();
+    };
   }, []);
 
   return (

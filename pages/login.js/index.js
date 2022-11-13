@@ -1,9 +1,40 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { authenticateUser } from "../../src/functions/fetches";
+import jwt_decode from "jwt-decode";
 
 export default function index() {
   const [name, setName] = useState("");
   const [pass, setPass] = useState("");
+
+  //google login
+
+  const handleCallbackResponse = (res) => {
+    try {
+      console.log(jwt_decode(res.credential));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    //comment for eslint
+    /*global google*/
+    google.accounts.id.initialize({
+      client_id:
+        "706801501845-gg3t3t0arpmkgs0o0bq8ctdnr0pc8q8d.apps.googleusercontent.com",
+      callback: handleCallbackResponse,
+    });
+
+    google.accounts.id.prompt();
+    google.accounts.id.renderButton(
+      document.getElementById("googleSignInDiv"),
+      {
+        theme: "outline",
+        size: "large",
+      }
+    );
+  }, []);
 
   return (
     <>
@@ -11,8 +42,8 @@ export default function index() {
         <h2>login</h2>
         <input type="text" onChange={(e) => setName(e.target.value)} />
         <input type="text" onChange={(e) => setPass(e.target.value)} />
+        <button onClick={() => authenticateUser({ name, pass })}>login</button>
         <div id="googleSignInDiv"></div>
-        <button onClick={() => {}}>login</button>
         <button onClick={() => {}}>register</button>
         <button onClick={() => {}}>log data</button>
       </div>
