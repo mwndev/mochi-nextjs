@@ -1,3 +1,5 @@
+import { backendURL } from "../../pages/_app";
+
 /* user data related */
 
 export const authenticateUser = async (userData) => {
@@ -31,4 +33,15 @@ export const editUserData = async (userData) => {
 
 export const signInWithToken = async (token) => {
   //in this case a google JWT, this creates a user if there isn't one present
+};
+
+export const sendToken = async (token) => {
+  const res = await fetch(`${backendURL}/jwt`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ rawToken: token }),
+  });
+  return await res.json();
 };

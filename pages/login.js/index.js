@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { authenticateUser } from "../../src/functions/fetches";
+import { authenticateUser, sendToken } from "../../src/functions/fetches";
 import jwt_decode from "jwt-decode";
+import { backendURL } from "../_app";
 
 export default function index() {
   const [name, setName] = useState("");
@@ -9,9 +10,11 @@ export default function index() {
 
   //google login
 
-  const handleCallbackResponse = (res) => {
+  const handleCallbackResponse = async (res) => {
     try {
       console.log(jwt_decode(res.credential));
+      const svData = await sendToken(res.credential);
+      window.alert(svData.m);
     } catch (error) {
       console.log(error);
     }
