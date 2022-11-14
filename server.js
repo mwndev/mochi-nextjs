@@ -48,7 +48,7 @@ sv.put("/jwt", async (req, res) => {
 
     const headerBuf = Buffer.from(parts[0], "base64");
     const bodyBuf = Buffer.from(parts[1], "base64");
-    const content = parts[1];
+    const content = parts[0] + "." + parts[1];
     const signature = base64url.toBase64(parts[2]);
 
     const kid = JSON.parse(headerBuf.toString()).kid;
@@ -63,7 +63,7 @@ sv.put("/jwt", async (req, res) => {
 
     console.log(pem);
 
-    let verifier = crypto.createVerify("RSA-SHA256");
+    const verifier = crypto.createVerify("RSA-SHA256");
 
     verifier.update(content);
 
@@ -74,7 +74,9 @@ sv.put("/jwt", async (req, res) => {
 
     console.log(verified);
 
-    res.status(200).json({ m: "success" });
+    verified
+      ? res.status(200).json({ m: "success" })
+      : res.status(400).json({ m: "invalid token" });
   } catch (error) {
     console.log(error);
   }
