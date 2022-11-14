@@ -2,13 +2,13 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const next = require("next");
+const getPem = require("rsa-pem-from-mod-exp");
+const crypto = require("crypto");
+const base64url = require("base64url");
+
 const dev = process.env.NODE_ENV !== "production";
 
 const app = next({ dev, hostname: "localhost", port: 3000 });
-
-const handle = app.getRequestHandler();
-
-console.log(handle);
 
 const sv = express();
 const port = process.env.PORT;
@@ -26,7 +26,6 @@ process.stdin.on("data", (data) => {
 
 sv.get("/", async (req, res) => {
   try {
-    console.log(req);
     res.status(201).json({ m: "hello /!" });
   } catch (error) {
     console.log(error);
@@ -48,13 +47,32 @@ sv.put("/jwt", async (req, res) => {
     const parts = token.split(".");
 
     const headerBuf = Buffer.from(parts[0], "base64");
+    const bodyBuf = Buffer.from(parts[1], "base64");
+    const content = parts[1];
+    const signature = base64url.toBase64(parts[2]);
 
     const kid = JSON.parse(headerBuf.toString()).kid;
 
-    console.log(data);
-    console.log(headerBuf);
+    let key;
 
-    if (kid !== data.kid) return res.status(400).json({ m: "failuer" });
+    if (kid === data.keys[0].kid) key = data.keys[0];
+    else if (kid === data.keys[1].kid) key = data.keys[1];
+    else return res.status(400).json({ m: "token not authentic" });
+
+    const pem = getPem(key.n, key.e);
+
+    console.log(pem);
+
+    let verifier = crypto.createVerify("RSA-SHA256");
+
+    verifier.update(content);
+
+    console.log(verifier);
+    console.log(signature);
+
+    const verified = verifier.verify(pem, signature, "base64");
+
+    console.log(verified);
 
     res.status(200).json({ m: "success" });
   } catch (error) {
