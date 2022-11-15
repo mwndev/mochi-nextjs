@@ -2,13 +2,11 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const next = require("next");
+const { verifyJWT } = require("./fns/authfns");
+
 const dev = process.env.NODE_ENV !== "production";
 
 const app = next({ dev, hostname: "localhost", port: 3000 });
-
-const handle = app.getRequestHandler();
-
-console.log(handle);
 
 const sv = express();
 const port = process.env.PORT;
@@ -26,37 +24,32 @@ process.stdin.on("data", (data) => {
 
 sv.get("/", async (req, res) => {
   try {
-    console.log(req);
     res.status(201).json({ m: "hello /!" });
   } catch (error) {
     console.log(error);
   }
 });
 
-sv.put("/jwt", async (req, res) => {
+sv.put("/jwt/google", async (req, res) => {
   try {
-    const token = req.body.rawToken;
+    const rawToken = req.body.rawToken;
 
-    const OAuthRoute = await (
-      await fetch(
-        "https://accounts.google.com/.well-known/openid-configuration"
-      )
-    ).json();
+    //returns boolean and userData
+    const { verified, userData } = await verifyJWT(
+      rawToken,
+      "https://accounts.google.com/.well-known/openid-configuration"
+    );
+    verified
+      ? res.status(200).json({ m: "success", userData: userData })
+      : res.status(400).json({ m: "invalid token" });
+  } catch (error) {
+    console.log(error);
+  }
+});
 
-    const data = await (await fetch(OAuthRoute.jwks_uri)).json();
-
-    const parts = token.split(".");
-
-    const headerBuf = Buffer.from(parts[0], "base64");
-
-    const kid = JSON.parse(headerBuf.toString()).kid;
-
-    console.log(data);
-    console.log(headerBuf);
-
-    if (kid !== data.kid) return res.status(400).json({ m: "failuer" });
-
-    res.status(200).json({ m: "success" });
+sv.post("/user/create", async (req, res) => {
+  try {
+    res.status(201).json({ m: "hello /!" });
   } catch (error) {
     console.log(error);
   }

@@ -36,7 +36,7 @@ export const signInWithToken = async (token) => {
 };
 
 export const sendToken = async (token) => {
-  const res = await fetch(`${backendURL}/jwt`, {
+  const res = await fetch(`${backendURL}/jwt/google`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

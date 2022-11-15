@@ -12,8 +12,8 @@ export default function index() {
 
   const handleCallbackResponse = async (res) => {
     try {
-      console.log(jwt_decode(res.credential));
       const svData = await sendToken(res.credential);
+
       window.alert(svData.m);
     } catch (error) {
       console.log(error);
