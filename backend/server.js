@@ -3,10 +3,10 @@ const express = require("express");
 const cors = require("cors");
 const next = require("next");
 const { verifyJWT, createCustomer } = require("./fns/userauthfns");
-const sdb_config = require("./surrealdb/sdb_config");
+const { sdb_config } = require("./surrealdb/sdb_config");
 
-const sdb = sdb_config();
-module.exports = { sdb };
+// const sdb = sdb_config();
+// const seven = 7;
 
 const dev = process.env.NODE_ENV !== "production";
 
@@ -44,7 +44,7 @@ sv.put("/jwt/google", async (req, res) => {
       "https://accounts.google.com/.well-known/openid-configuration"
     );
     verified
-      ? res.status(200).json({ m: "success", userData: userData })
+      ? res.status(200).json({ m: "success", userData })
       : res.status(400).json({ m: "invalid token" });
   } catch (error) {
     console.log(error);
@@ -53,7 +53,11 @@ sv.put("/jwt/google", async (req, res) => {
 
 sv.post("/user/create", async (req, res) => {
   try {
-    const created = await createCustomer(req.body.userData);
+    console.log(req.body);
+
+    const created = await createCustomer(req.body);
+    console.log("created");
+    console.log(created);
 
     res
       .status(201)

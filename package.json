@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "sv": "nodemon server.js",
+    "sv": "nodemon ./backend/server.js",
     "sv_prod": "node server.js"
   },
   "dependencies": {
@@ -25,7 +25,8 @@
     "redis": "^4.5.0",
     "rsa-pem-from-mod-exp": "^0.8.5",
     "styled-components": "^5.3.6",
-    "surrealdb.js": "^0.5.0"
+    "surrealdb.js": "^0.5.0",
+    "uuidv4": "^6.2.13"
   },
   "devDependencies": {
     "eslint": "8.27.0",

@@ -1,17 +1,21 @@
 const getPem = require("rsa-pem-from-mod-exp");
 const crypto = require("crypto");
 const base64url = require("base64url");
-const { sdb } = require("../server");
 const bcrypt = require("bcrypt");
+const { v4: uuidv4 } = require("uuidv4");
+const { redisClient } = require("../redis/redis_config");
+const { sdb } = require("../surrealdb/sdb_config");
 
 const createCustomer = async (userData) => {
   let data = userData;
 
+  if (userData.pass.length < 1) return false;
+
   console.log(data);
 
-  const salt = bcrypt.genSalt();
+  const salt = await bcrypt.genSalt();
 
-  const hashed = bcrypt.hash(data.pass, salt);
+  const hashed = await bcrypt.hash(data.pass, salt);
 
   delete data.pass;
 
@@ -19,21 +23,47 @@ const createCustomer = async (userData) => {
 
   console.log(data);
 
+  console.log(sdb);
+
   const created = await sdb.create("customer", data);
   return created;
 };
 
 //returns false, null, or account data
-const loginCustomer = async (authData) => {
-  const account = await sdb.query(
-    `SELECT * FROM customer WHERE email = ${authData}`
-  );
-  if (account === [] || account === null) return null;
+const loginCustomer = async (authData, keepLoggedIn) => {
+  try {
+    const account = await sdb.query(
+      `SELECT * FROM customer WHERE email = ${authData}`
+    );
+    if (account === [] || account === null) return null;
 
-  const validPass = await bcrypt.compare(authData.pass, account.pass);
-  if (!validPass) return false;
+    const validPass = await bcrypt.compare(authData.pass, account.hashedpass);
+    if (!validPass) return false;
 
-  return account.data;
+    const sessionID = uuidv4();
+
+    await redisClient.setEx(sessionID, 3600, account.email);
+
+    if (!keepLoggedIn)
+      return {
+        userData: account.data,
+        email: account.email,
+        sessionID,
+      };
+
+    const stayLoggedInID = uuidv4();
+
+    await redisClient.setEx(stayLoggedInID, 3600 * 24 * 7, account.email);
+
+    return {
+      userData: account.data,
+      email: account.email,
+      sessionID,
+      stayLoggedInID,
+    };
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const deleteCustomer = async (authData) => {

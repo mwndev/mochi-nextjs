@@ -1,8 +1,11 @@
 require("dotenv").config({ path: "../../.env" });
 const Surreal = require("surrealdb.js").default;
 
-const db = new Surreal("http://127.0.0.1:8000/rpc");
-
+const fdb = () => {
+  console.log("connecting sdb");
+  return new Surreal("http://127.0.0.1:8000/rpc");
+};
+const db = fdb();
 async function sdb_config() {
   try {
     // Signin as a namespace, database, or root user
@@ -19,4 +22,6 @@ async function sdb_config() {
     console.error("ERROR", e);
   }
 }
-module.exports = sdb_config;
+sdb_config();
+
+module.exports = { sdb: db };
