@@ -2,7 +2,11 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const next = require("next");
-const { verifyJWT } = require("./fns/authfns");
+const { verifyJWT, createCustomer } = require("./fns/userauthfns");
+const sdb_config = require("./surrealdb/sdb_config");
+
+const sdb = sdb_config();
+module.exports = { sdb };
 
 const dev = process.env.NODE_ENV !== "production";
 
@@ -49,7 +53,11 @@ sv.put("/jwt/google", async (req, res) => {
 
 sv.post("/user/create", async (req, res) => {
   try {
-    res.status(201).json({ m: "hello /!" });
+    const created = await createCustomer(req.body.userData);
+
+    res
+      .status(201)
+      .json({ m: "hello /!", success: created !== null && created !== [] });
   } catch (error) {
     console.log(error);
   }
